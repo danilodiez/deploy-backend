@@ -41,7 +41,7 @@
             const article = e.target.closest('article')
             const id = article.dataset.id
 
-            fetch(`http://localhost:8000/items/${id}`, {
+            fetch(`https://deploy-backend-fkn9.onrender.com/items/${id}`, {
               method: 'DELETE'
             })
               .then(res => {
