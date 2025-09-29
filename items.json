@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1a2b3c4d-0001",
+    "title": "Cafetera Italiana",
+    "year": 2023,
+    "brand": "Bialetti",
+    "price": 45.99,
+    "poster": "https://example.com/images/cafetera.jpg",
+    "category": ["Hogar", "Cocina"],
+    "rate": 4.7
+  },
+  {
+    "id": "1a2b3c4d-0002",
+    "title": "Zapatillas Deportivas",
+    "year": 2024,
+    "brand": "Adidas",
+    "price": 89.5,
+    "poster": "https://example.com/images/zapatillas.jpg",
+    "category": ["Moda", "Calzado"],
+    "rate": 4.5
+  },
+  {
+    "id": "1a2b3c4d-0003",
+    "title": "Auriculares Inalámbricos",
+    "year": 2024,
+    "brand": "Sony",
+    "price": 129.99,
+    "poster": "https://example.com/images/auriculares.jpg",
+    "category": ["Electrónica", "Audio"],
+    "rate": 4.8
+  },
+  {
+    "id": "1a2b3c4d-0004",
+    "title": "Silla Ergonómica de Oficina",
+    "year": 2022,
+    "brand": "ErgoPlus",
+    "price": 210.0,
+    "poster": "https://example.com/images/silla.jpg",
+    "category": ["Muebles", "Oficina"],
+    "rate": 4.6
+  },
+  {
+    "id": "1a2b3c4d-0005",
+    "title": "Teléfono Inteligente",
+    "year": 2024,
+    "brand": "Xiaomi",
+    "price": 399.0,
+    "poster": "https://example.com/images/telefono.jpg",
+    "category": ["Electrónica", "Móviles"],
+    "rate": 4.4
+  },
+  {
+    "id": "1a2b3c4d-0006",
+    "title": "Campera de Cuero",
+    "year": 2023,
+    "brand": "Levi's",
+    "price": 320.0,
+    "poster": "https://example.com/images/campera.jpg",
+    "category": ["Moda", "Ropa"],
+    "rate": 4.9
+  }
+]
