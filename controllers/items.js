@@ -44,7 +44,8 @@ export class ItemsController {
     }
   }
 
-  // METODO DELETE PARA BORRAR UN RECURSO - TODO!
+  // METODO DELETE PARA BORRAR UN RECURSO
+  // TODO
   static async delete(req, res) {
     const { id } = req.params;
     const foundIndex = articles.findIndex(({ id: itemId }) => itemId === id);
