@@ -26,11 +26,12 @@ export class ItemsController {
   // Creacion
   create = async (req, res) => {
     const result = validateItem(req.body);
-
+    console.log(result);
     if (result.success) {
-      const id = crypto.randomUUID();
+
       const { title, year, brand, price, poster, category, rate } = req.body;
       const newArticles = await this.model.create({ title, year, brand, price, poster, category, rate })
+      console.log(newArticles);
       res.send(newArticles);
     }
   }

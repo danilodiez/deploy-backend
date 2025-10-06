@@ -32,7 +32,7 @@ export class ItemModel {
   static async getByName({ name }) {
     try {
       const [results, fields] = await connection.query(
-        'SELECT * FROM `products` WHERE = ?',
+        'SELECT *, BIN_TO_UUID(id) id FROM `products` WHERE = ?',
         [name]
       );
       if (results.length < 1) {
@@ -55,15 +55,18 @@ export class ItemModel {
       // MONITOREO
     }
 
-    const [product] = connection.query(`SELECT * FROM products WHERE id= UUID_TO_BIN(?);`, [uuid])
+    const [product] = await connection.query(`SELECT *, BIN_TO_UUID(id) id  FROM products WHERE id= UUID_TO_BIN(?);`, [uuid])
+    console.log({ product });
 
     await connection.query(`INSERT INTO product_categories (product_id, category_id)
       SELECT p.id, c.id
       FROM products p
-      JOIN category c ON c.name IN ('?')
-      WHERE p.id=UUID_TO_BIN("${uuid}")'
+      JOIN category c ON c.name IN (?)
+      WHERE p.id=UUID_TO_BIN("${uuid}")
       ORDER BY p.created_at DESC
-      LIMIT 1;`
+      LIMIT 1;`, [
+      category
+    ]
     )
     if (product.length < 1) {
       return { statusCode: 204, results: [] }
