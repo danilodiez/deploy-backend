@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { ItemsController } from "../controllers/items.js";
+import { ItemModel } from "../models/mysql/item.js";
 
 export const itemsRouter = Router();
-
-itemsRouter.get("/", ItemsController.getAll)
-itemsRouter.get("/:name", ItemsController.getByName)
-itemsRouter.post("/", ItemsController.create)
-itemsRouter.patch("/:id", ItemsController.update)
-itemsRouter.delete("/:id", ItemsController.delete)
+const itemsController = new ItemsController({ itemModel: ItemModel });
+itemsRouter.get("/", itemsController.getAll)
+itemsRouter.get("/:name", itemsController.getByName)
+itemsRouter.post("/", itemsController.create)
+itemsRouter.patch("/:id", itemsController.update)
+itemsRouter.delete("/:id", itemsController.delete)
