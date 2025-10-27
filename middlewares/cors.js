@@ -5,6 +5,7 @@ export const corsMiddleware = () => cors({
     const ACCEPTED_ORIGINS = [
       "http://localhost:8080",
       "http://localhost:3000",
+      "http://localhost:8000",
     ];
 
     if (ACCEPTED_ORIGINS.includes(origin)) {
@@ -17,4 +18,5 @@ export const corsMiddleware = () => cors({
 
     return callback(new Error("Not allowed by CORS"));
   },
+  credentials: true // Permitir cookies
 })

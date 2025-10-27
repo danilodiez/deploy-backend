@@ -1,27 +1,14 @@
-import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
-
+import { getConnection } from "../../config/database.js";
 
 const SALT_ROUNDS = 10;
-
-
-const DEFAULT_CONFIG = {
-  host: 'localhost',
-  user: 'root',
-  port: 3306,
-  password: '',
-  database: 'productsdb'
-}
-
-const connectionString = DEFAULT_CONFIG;
-
-const connection = await mysql.createConnection(connectionString);
 
 
 export class UserModel {
 
   static async getUser({ email }) {
     try {
+      const connection = await getConnection();
       const [results, fields] = await connection.query(
         'SELECT *, BIN_TO_UUID(id) id FROM `users` where email = ?',
         [email]
@@ -31,26 +18,47 @@ export class UserModel {
       }
       return { statusCode: 200, user: results };
     } catch (err) {
-      // console.log(err);
-      // SE ENVIA EL ERROR A UN SERVICIO DE MONITOREO
+      return { statusCode: 500, results: [], error: err.message };
+    }
+  }
+
+  static async getUserById({ id }) {
+    try {
+      const connection = await getConnection();
+      const [results] = await connection.query(
+        'SELECT name, email, BIN_TO_UUID(id) id, balance FROM `users` where id = UUID_TO_BIN(?)',
+        [id]
+      );
+      if (results.length < 1) {
+        return { statusCode: 404, user: null };
+      }
+      return { statusCode: 200, user: results[0] };
+    } catch (err) {
+      return { statusCode: 500, user: null, error: err.message };
     }
   }
 
   static async register({ name, email, password }) {
+    const connection = await getConnection();
     const [uuidResult] = await connection.query('SELECT UUID() uuid;')
     const [{ uuid }] = uuidResult;
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     try {
-      await connection.query(`INSERT INTO users (id, name, email, password) VALUES (UUID_TO_BIN("${uuid}"), ?, ?,?)`, [
-        name, email, hashedPassword,
-      ])
+      await connection.query(
+        `INSERT INTO users (id, name, email, password, balance) 
+         VALUES (UUID_TO_BIN("${uuid}"), ?, ?, ?, 0)`, 
+        [name, email, hashedPassword]
+      )
     } catch (e) {
-      // MONITOREO
+      return { statusCode: 500, message: "Error al crear el usuario", error: e.message };
     }
 
-    const [user] = await connection.query(`SELECT name, email  FROM users WHERE id= UUID_TO_BIN(?);`, [uuid])
+    const [user] = await connection.query(
+      `SELECT name, email, BIN_TO_UUID(id) id FROM users WHERE id= UUID_TO_BIN(?);`, 
+      [uuid]
+    );
 
     if (user.length < 1) {
       return { statusCode: 500, message: "No se pudo crear el usuario" }
@@ -65,20 +73,72 @@ export class UserModel {
     if (!email) throw new Error('No se envio email en la peticion');
 
     try {
+      const connection = await getConnection();
       const [users] = await connection.query(
         'SELECT * from users WHERE email = ?',
         [email]
       );
+      
+      if (users.length === 0) {
+        return { statusCode: 403, message: "Usuario no encontrado", success: false };
+      }
+      
       const correctPassword = await bcrypt.compare(password, users[0].password);
       if (correctPassword) {
-        return { statusCode: 200, message: "El usuario se loggeo correctamente", success: true, user: { name: users[0].name, email: users[0].email } };
+        return { 
+          statusCode: 200, 
+          message: "El usuario se loggeo correctamente", 
+          success: true, 
+          user: { 
+            id: users[0].id, 
+            name: users[0].name, 
+            email: users[0].email,
+            balance: users[0].balance || 0
+          } 
+        };
       } else {
         return { statusCode: 403, message: "Hubo un error con la contraseña", success: false };
       }
 
     } catch (e) {
-      // MONITOREO
-      return { ok: false };
+      return { statusCode: 500, message: "Error al loguear", success: false };
+    }
+  }
+
+  static async updateBalance({ userId, amount }) {
+    try {
+      const connection = await getConnection();
+      await connection.query(
+        'UPDATE users SET balance = balance + ? WHERE id = UUID_TO_BIN(?)',
+        [amount, userId]
+      );
+      
+      const [users] = await connection.query(
+        'SELECT name, email, BIN_TO_UUID(id) id, balance FROM users WHERE id = UUID_TO_BIN(?)',
+        [userId]
+      );
+      
+      return { statusCode: 200, user: users[0] };
+    } catch (e) {
+      return { statusCode: 500, user: null, error: e.message };
+    }
+  }
+
+  static async getBalance({ userId }) {
+    try {
+      const connection = await getConnection();
+      const [results] = await connection.query(
+        'SELECT balance FROM users WHERE id = UUID_TO_BIN(?)',
+        [userId]
+      );
+      
+      if (results.length < 1) {
+        return { statusCode: 404, balance: null };
+      }
+      
+      return { statusCode: 200, balance: results[0].balance || 0 };
+    } catch (e) {
+      return { statusCode: 500, balance: null, error: e.message };
     }
   }
 }

@@ -70,3 +70,5 @@ AND p.year = 2024
 AND p.brand = 'Adidas'
 ORDER BY p.created_at DESC
 LIMIT 2;
+
+

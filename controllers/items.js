@@ -23,6 +23,12 @@ export class ItemsController {
       res.send(filteredArticle);
     }
   }
+
+  getById = async (req, res) => {
+    const { id } = req.params
+    const result = await this.model.getById({ id })
+    res.status(result.statusCode).send(result);
+  }
   // Creacion
   create = async (req, res) => {
     const result = validateItem(req.body);
@@ -39,22 +45,22 @@ export class ItemsController {
 
   update = async (req, res) => {
     const { id } = req.params
-    const foundIndex = articles.findIndex(({ id: itemId }) => itemId === id);
-
     const validationResult = validateItemPartial(req.body)
 
     if (validationResult.success) {
-      const modifiedArticles = await this.model.update({ foundIndex, body: req.body })
-      res.send(modifiedArticles)
+      const result = await this.model.update({ id, body: req.body })
+      if (result) {
+        return res.status(result.statusCode).send(result);
+      }
+      return res.status(400).send({ error: "Error al actualizar el producto" });
     }
+    return res.status(400).send({ error: "Datos inválidos" });
   }
 
   delete = async (req, res) => {
     const { id } = req.params;
-
-    const articles = this.model.delete({ id });
-
-    res.send(articles);
+    const result = await this.model.delete({ id });
+    res.status(result.statusCode).send(result);
   }
 
 }

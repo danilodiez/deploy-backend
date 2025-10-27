@@ -23,8 +23,9 @@ const itemSchema = z.object({
       required_error: "La categoria es obligatoria",
       invalid_type_error: "El campo es incorrecto",
     }
-  ),
-  rate: z.number().min(0).max(5)
+  ).optional(),
+  rate: z.number().min(0).max(5),
+  stock: z.number().int().min(0).optional()
 });
 
 
